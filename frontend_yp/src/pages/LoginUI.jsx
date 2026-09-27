@@ -70,7 +70,7 @@ export default function LoginUI() {
       console.log("Login Data:", loginData);
 
       const response = await axios.post(
-        "http://127.2.0.1:7000/api/yp/user/login",
+        `${import.meta.env.VITE_API_URL}/api/yp/user/login`,
         loginData
       );
 

@@ -7,7 +7,7 @@ import { useCart } from "../components/context/cartContext";
 // IMPORTANT:
 // Your previous URL had 127.2.0.1.
 // Use 127.0.0.1 if your backend is running locally.
-const API_URL = "http://127.2.0.1:7000/api/yp/products";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/yp/products`;
 
 // ---------------------------------------------------------
 // GET PRODUCT ID

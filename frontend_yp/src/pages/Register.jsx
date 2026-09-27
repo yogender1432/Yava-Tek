@@ -28,7 +28,7 @@ const Register = () => {
     setError(null);
     
     try {
-          const response = await axios.post("http://127.2.0.1:7000/api/yp/user/register    ", formData);
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/yp/user/register    `, formData);
         console.log("Registration successful", response.data);
         if (response.data.token) {
         localStorage.setItem('token', response.data.token);
