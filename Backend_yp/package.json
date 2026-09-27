@@ -24,7 +24,7 @@
     "razorpay": "^2.9.8"
   },
   "devDependencies": {
-    "mongoose": "^9.9.2",
-     "nodemon": "^3.1.14"
+    "mongoose": "^9.10.2",
+    "nodemon": "^3.1.14"
   }
 }

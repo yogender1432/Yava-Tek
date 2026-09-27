@@ -10,7 +10,7 @@ const productRoutes = require('./routes/product.routes');
 
 // 1. Configure CORS to allow frontend requests and credentials
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'], // Replace with your frontend URL/port
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://frontendyp.vercel.app/'], // Replace with your frontend URL/port
   credentials: true
 }));
 
