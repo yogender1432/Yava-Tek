@@ -185,7 +185,7 @@ export default function LoginUI() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter email or phone number"
+              placeholder="Enter email or Phone number"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg
               outline-none transition

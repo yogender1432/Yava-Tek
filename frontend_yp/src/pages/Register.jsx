@@ -12,7 +12,7 @@ const Register = () => {
 
   const [formData, setFormData] = useState({
     username: "",
-    phone: "",
+    Phone: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -28,7 +28,7 @@ const Register = () => {
     setError(null);
     
     try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/yp/user/register    `, formData);
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/yp/user/register`, formData);
         console.log("Registration successful", response.data);
         if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -43,11 +43,7 @@ const Register = () => {
       }
 
     console.log("Registration Data:", formData);
-
-    // Add your API call here
-    // Example:
-    // axios.post("http://localhost:5000/api/register", formData)
-  };
+    };
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-10">
@@ -103,7 +99,7 @@ const Register = () => {
             {/* Phone */}
             <div>
               <label
-                htmlFor="phone"
+                htmlFor="Phone"
                 className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Phone Number
@@ -114,11 +110,11 @@ const Register = () => {
 
                 <input
                   type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  id="Phone"
+                  name="Phone"
+                  value={formData.Phone}
                   onChange={handleChange}
-                  placeholder="Enter your phone number"
+                  placeholder="Enter your Phone number"
                   className="w-full rounded-lg border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
                   required
                 />
