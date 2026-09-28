@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
   },
 
-  phone: {
+  Phone: {
     type: String,
     required: true,
     trim: true,

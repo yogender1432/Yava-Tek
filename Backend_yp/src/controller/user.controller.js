@@ -3,295 +3,114 @@ const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const Employee = require("../models/employee.model");
 
-// ======================================================
-// COOKIE OPTIONS
-// ======================================================
+// require("dotenv").config();
 
+// Helper to standardise cookie configuration
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: process.env.NODE_ENV === "production", // True in production HTTPS
   sameSite: "lax",
-  maxAge: 24 * 60 * 60 * 1000,
+  maxAge: 24 * 60 * 60 * 1000 // 1 day in milliseconds
 };
-
-// ======================================================
-// REGISTER USER
-// ======================================================
 
 async function registerUser(req, res) {
   try {
-    console.log("REGISTER REQUEST BODY:", req.body);
+    const { username, email,Phone, password, confirmPassword } = req.body;
 
-    const {
-      username,
-      email,
-      phone,
-      password,
-      confirmPassword,
-    } = req.body;
-
-    // --------------------------------------------------
-    // 1. Required fields
-    // --------------------------------------------------
-
-    if (
-      !username ||
-      !email ||
-      !phone ||
-      !password ||
-      !confirmPassword
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
+    // 1. Validation
+    if (!username || !email || !Phone || !password || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-
-    // --------------------------------------------------
-    // 2. Password confirmation
-    // --------------------------------------------------
 
     if (password !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Passwords do not match",
-      });
+      return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    // --------------------------------------------------
-    // 3. Password length
-    // --------------------------------------------------
+    // 2. Prevent Privilege Escalation (Always force default role or sanitize)
+    const role = "user"; 
 
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters long",
-      });
-    }
-
-    // --------------------------------------------------
-    // 4. Clean input
-    // --------------------------------------------------
-
-    const cleanUsername = username.trim();
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = phone.trim();
-
-    // --------------------------------------------------
-    // 5. Check existing user
-    // --------------------------------------------------
-
-    const existingUser = await userModel.findOne({
-      $or: [
-        { username: cleanUsername },
-        { email: cleanEmail },
-        { phone: cleanPhone },
-      ],
+    // 3. Check existing user
+    const isUserAlreadyExists = await userModel.findOne({
+      $or: [{ username }, { email }]
     });
 
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "User already exists",
-      });
+    if (isUserAlreadyExists) {
+      return res.status(409).json({ message: "User or email already exists" });
     }
 
-    // --------------------------------------------------
-    // 6. Hash password
-    // --------------------------------------------------
+    // 4. Hash password
+    const hashed = await bcrypt.hash(password, 10);
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
-
-    // --------------------------------------------------
-    // 7. Create user
-    //
-    // Do NOT save confirmPassword
-    // --------------------------------------------------
-
+    // 5. Create user
     const user = await userModel.create({
-      username: cleanUsername,
-      email: cleanEmail,
-      phone: cleanPhone,
-      password: hashedPassword,
-      role: "user",
+      username,
+      email,
+      Phone,
+      password: hashed,
+      confirmPassword: hashed, // Store hashed confirmPassword for consistency, though ideally not stored
+      role
     });
 
-    // --------------------------------------------------
-    // 8. Check JWT secret
-    // --------------------------------------------------
-
-    if (!process.env.JWT_SECRET) {
-      console.error("JWT_SECRET is missing in .env");
-
-      return res.status(500).json({
-        success: false,
-        message: "JWT_SECRET is not configured",
-      });
-    }
-
-    // --------------------------------------------------
-    // 9. Generate JWT
-    // --------------------------------------------------
-
+    // 6. Generate Token
     const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: "1d" }
     );
 
-    // --------------------------------------------------
-    // 10. Set cookie
-    // --------------------------------------------------
-
-    res.cookie(
-      "token",
-      token,
-      COOKIE_OPTIONS
-    );
-
-    // --------------------------------------------------
-    // 11. Response
-    // --------------------------------------------------
+    // 7. Set Secure Cookie
+    res.cookie("token", token, COOKIE_OPTIONS);
 
     return res.status(201).json({
-      success: true,
       message: "User registered successfully",
-
+      token,
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
+        Phone: user.Phone,
+        role: user.role
+      }
     });
-
   } catch (error) {
-
-    console.error("================================");
-    console.error("REGISTER ERROR");
-    console.error("Name:", error.name);
-    console.error("Message:", error.message);
-    console.error("Code:", error.code);
-    console.error("Full Error:", error);
-    console.error("================================");
-
-    // --------------------------------------------------
-    // Duplicate MongoDB key
-    // --------------------------------------------------
-
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "Username, email or phone already exists",
-        duplicate: error.keyValue,
-      });
-    }
-
-    // --------------------------------------------------
-    // Mongoose validation error
-    // --------------------------------------------------
-
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: Object.values(error.errors).map(
-          (err) => err.message
-        ),
-      });
-    }
-
-    // --------------------------------------------------
-    // Other error
-    // --------------------------------------------------
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
+    console.error("Register Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// ======================================================
-// LOGIN USER
-// ======================================================
-
 async function loginuser(req, res) {
   try {
-    const {
-      identifier,
-      email,
-      username,
-      password,
-      role,
-      employeeId,
-    } = req.body;
-
-    const loginKey = (
-      identifier ||
-      username ||
-      email ||
-      ""
-    ).trim();
+    const { identifier, email, username, password ,employeeId} = req.body;
+    const loginKey = identifier || username || email;
 
     if (!loginKey || !password) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Please enter your username/email and password",
-      });
+      return res.status(400).json({ message: "Please enter your username/email and password" });
     }
 
-    // Find user and explicitly include password
-    const user = await userModel
-      .findOne({
-        $or: [
-          { username: loginKey },
-          { email: loginKey.toLowerCase() },
-        ],
-      })
-      .select("+password");
+    // Explicitly select password in case model marks it as select: false
+    const user = await userModel.findOne({
+      $or: [{ username: loginKey }, { email: loginKey }]
+    }).select("+password");
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Compare password
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // ==================================================
-    // ADMIN EMPLOYEE ID CHECK
-    // ==================================================
+    const isAdminLogin = req.body.role === "admin";
 
-    if (role === "admin") {
+    if (isAdminLogin && user.role === "admin") {
 
+       async function validateEmployeeId(employeeId) {
       if (!employeeId) {
         return res.status(400).json({
           success: false,
-          message: "Employee ID is required",
+          message: "Employee ID is required for admin login",
         });
       }
 
@@ -307,201 +126,99 @@ async function loginuser(req, res) {
             "Invalid or inactive Employee ID",
         });
       }
-    }
 
-    // --------------------------------------------------
-    // JWT
-    // --------------------------------------------------
-
-    if (!process.env.JWT_SECRET) {
-      return res.status(500).json({
-        success: false,
-        message: "JWT_SECRET is not configured",
-      });
-    }
+    } 
+  }
 
     const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: "1d" }
     );
 
-    // Cookie
-    res.cookie(
-      "token",
-      token,
-      COOKIE_OPTIONS
-    );
+    res.cookie("token", token, COOKIE_OPTIONS);
 
     return res.status(200).json({
-      success: true,
       message: "User logged in successfully",
-
+      token,
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
+        role: user.role
+      }
     });
-
   } catch (error) {
     console.error("Login Error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// ======================================================
-// LOGOUT
-// ======================================================
+
 
 async function logoutUser(req, res) {
   try {
-
-    res.clearCookie(
-      "token",
-      COOKIE_OPTIONS
-    );
-
-    return res.status(200).json({
-      success: true,
-      message: "User logged out successfully",
-    });
-
+    // Pass same cookie options when clearing
+    res.clearCookie("token", COOKIE_OPTIONS);
+    return res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
-
     console.error("Logout Error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// ======================================================
-// GET CURRENT USER
-// ======================================================
-
 async function getCurrentUser(req, res) {
   try {
-
-    const token =
-      req.cookies?.token ||
-      req.headers?.authorization?.split(" ")[1];
+    // Safe extraction handling missing cookies middleware or missing token
+    const token = req.cookies?.token || req.headers?.authorization?.split(" ")[1];
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: No token provided",
-      });
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
-
     let decoded;
-
     try {
-
-      decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET
-      );
-
-    } catch (error) {
-
-      return res.status(401).json({
-        success: false,
-        message:
-          "Unauthorized: Invalid or expired token",
-      });
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
     }
 
-    const user = await userModel
-      .findById(decoded.id)
-      .select("-password");
+    const user = await userModel.findById(decoded.id).select("-password");
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
     return res.status(200).json({
-      success: true,
-
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
+        role: user.role
+      }
     });
-
   } catch (error) {
-
-    console.error(
-      "Get Current User Error:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    console.error("Get Current User Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
-
-// ======================================================
-// GET ALL USERS
-// ======================================================
-
 async function getAllUsers(req, res) {
   try {
 
-    const users = await userModel
-      .find()
-      .select("-password");
+    // 1. Fetch all users excluding their password fields
+   
+    const users = await userModel.find().select("-password");
 
+
+    // 2. Return the array of users
     return res.status(200).json({
       success: true,
       count: users.length,
-      users,
+      users
     });
-
   } catch (error) {
-
-    console.error(
-      "Get All Users Error:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    console.error("Get All Users Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// ======================================================
-// EXPORT
-// ======================================================
-
-module.exports = {
-  registerUser,
-  loginuser,
-  logoutUser,
-  getCurrentUser,
-  getAllUsers,
-};
+module.exports = { registerUser, loginuser, logoutUser, getCurrentUser,getAllUsers };
