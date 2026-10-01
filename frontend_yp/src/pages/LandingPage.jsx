@@ -1,8 +1,50 @@
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-// Data for Trending Palettes
+// Data for Trending Yava Paints Products (extracted from Dealer Rate List)
 const trendingPalettes = [
- 
+  {
+    name: 'Ever Glow Emulsion',
+    code: '20 LTR',
+    price: '₹6,836.80',
+    category: 'Emulsions',
+    imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    name: 'Dual Power Advance Emulsion',
+    code: '20 LTR',
+    price: '₹5,435.00',
+    category: 'Emulsions',
+    imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    name: 'Roof Top Sealant',
+    code: '20 LTR',
+    price: '₹4,717.80',
+    category: 'Sealants',
+    imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    name: 'Fordax Exterior Emulsion',
+    code: '20 LTR',
+    price: '₹3,145.60',
+    category: 'Emulsions',
+    imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    name: 'Starex Dual Primer',
+    code: '20 LTR',
+    price: '₹1,562.40',
+    category: 'Primers',
+    imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    name: 'Happy Lac Distemper',
+    code: '20 KGS',
+    price: '₹809.20',
+    category: 'Distempers',
+    imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop',
+  },
 ];
 
 // Data for Shop By Room Section
@@ -29,7 +71,8 @@ export default function LandingPage() {
     <div className="w-full bg-white text-gray-800 font-sans">
       
       {/* 1. HERO SECTION */}
-      <section className="relative w-full h-[85vh] min-h-[550px] bg-cover bg-center flex items-center justify-start px-6 md:px-16"
+      <section 
+        className="relative w-full h-[85vh] min-h-[550px] bg-cover bg-center flex items-center justify-start px-6 md:px-16"
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop')`,
         }}
@@ -43,7 +86,7 @@ export default function LandingPage() {
             The Architecture of Color.
           </h1>
           <p className="text-sm md:text-base text-gray-200 leading-relaxed">
-            Experience paint engineered for industrial reliability and curated for artistic expression. Transform your space with Yavapaints&apos; premium finishes.
+            Experience paint engineered for industrial reliability and curated for artistic expression. Transform your space with Yava Paints&apos; premium finishes.
           </p>
           <div className="flex flex-wrap gap-4 pt-2">
             <NavLink
@@ -56,13 +99,13 @@ export default function LandingPage() {
               to="/cart"
               className="border border-white text-white font-semibold text-sm px-6 py-3 rounded-lg hover:bg-white/10 transition-all"
             >
-              Orders watches
+              Order Swatches
             </NavLink>
           </div>
         </div>
       </section>
 
-      {/* 2. TRENDING PALETTE SECTION */}
+      {/* 2. TRENDING PRODUCTS / PALETTE SECTION */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 py-16">
         <div className="flex justify-between items-end mb-8">
           <div>
@@ -70,27 +113,41 @@ export default function LandingPage() {
               Curated Selection
             </span>
             <h2 className="font-serif text-3xl font-bold text-[#002B49] mt-1">
-              Trending Palette 2024
+              Featured Yava Coatings
             </h2>
           </div>
           <NavLink
             to="/collections"
             className="text-xs font-semibold text-[#002B49] underline underline-offset-4 hover:opacity-80"
           >
-            View All Colors
+            View All Products
           </NavLink>
         </div>
 
-        {/* Swatches Grid */}
+        {/* Product Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {trendingPalettes.map((item, index) => (
-            <div key={index} className="space-y-2 group cursor-pointer">
-              <div className={`w-full h-44 rounded-lg shadow-sm ${item.bg} group-hover:border-amber-400 group-hover:border-2 shadow-md transition-shadow`} />
-              <div>
-                <h4 className="text-xs font-bold text-gray-900">{item.name}</h4>
-                <p className="text-[10px] text-gray-500">{item.code} • {item.finish}</p>
+            <NavLink key={index} to="/collections" className="space-y-2 group cursor-pointer block">
+              <div className="relative w-full h-44 rounded-lg overflow-hidden border border-gray-100 bg-gray-50 shadow-sm group-hover:shadow-md transition-shadow">
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider bg-white/90 text-[#002B49] px-1.5 py-0.5 rounded shadow-sm">
+                  {item.category}
+                </span>
               </div>
-            </div>
+              <div>
+                <h4 className="text-xs font-bold text-gray-900 group-hover:text-[#002B49] truncate">
+                  {item.name}
+                </h4>
+                <div className="flex items-center justify-between mt-0.5">
+                  <p className="text-[10px] text-gray-500 font-medium">{item.code}</p>
+                  <p className="text-xs font-bold text-[#002B49]">{item.price}</p>
+                </div>
+              </div>
+            </NavLink>
           ))}
         </div>
       </section>
@@ -122,9 +179,12 @@ export default function LandingPage() {
                   <h3 className="font-serif text-2xl font-bold">{room.title}</h3>
                   <p className="text-xs text-gray-300">{room.description}</p>
                   <div className="pt-2">
-                    <button className="bg-white/20 backdrop-blur-md border border-white/30 text-white font-medium text-xs px-4 py-2 rounded-md hover:bg-white hover:text-black transition-all">
+                    <NavLink
+                      to="/collections"
+                      className="inline-block bg-white/20 backdrop-blur-md border border-white/30 text-white font-medium text-xs px-4 py-2 rounded-md hover:bg-white hover:text-black transition-all"
+                    >
                       Shop Colors
-                    </button>
+                    </NavLink>
                   </div>
                 </div>
               </div>
@@ -135,12 +195,12 @@ export default function LandingPage() {
 
       {/* 4. EXPERTISE & SUPPORT SECTION */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 py-20">
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
           {/* Image & Experience Badge Side */}
           <div className="relative">
             {/* Top Yellow Accent Block */}
-            <div className="absolute -top-3 -left-3 w-16 h-16 bg-[#E9C349] -z-10" />
+            <div className="absolute -top-3 -left-3 w-16 h-16 bg-[#E9C349] -z-10 rounded-tl-lg" />
 
             <div className="relative rounded-lg overflow-hidden shadow-xl">
               <img
@@ -178,7 +238,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-gray-900">On-Site Color Matching</h4>
-                  <p className="text-xs text-gray-600">Precision tech to match any surface or fabric perfectly.</p>
+                  <p className="text-xs text-gray-600">Precision tech to match any surface or shade preference.</p>
                 </div>
               </div>
 
@@ -190,7 +250,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-gray-900">Industrial Grade Coatings</h4>
-                  <p className="text-xs text-gray-600">Durability that exceeds commercial standards for your home.</p>
+                  <p className="text-xs text-gray-600">Durability that exceeds commercial standards for every project.</p>
                 </div>
               </div>
 
@@ -202,7 +262,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-gray-900">Pro-Network Referrals</h4>
-                  <p className="text-xs text-gray-600">Connect with certified Yavapaints master applicators.</p>
+                  <p className="text-xs text-gray-600">Connect with certified Yava Paints master applicators.</p>
                 </div>
               </div>
             </div>

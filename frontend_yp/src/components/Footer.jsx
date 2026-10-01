@@ -1,3 +1,6 @@
+import { NavLink } from "react-router-dom";
+
+
 export default function Footer() {
   return (
     <footer className="relative bg-[#1A1D20] text-gray-300 px-8 lg:px-16 py-12 font-sans text-sm">
@@ -46,7 +49,7 @@ export default function Footer() {
             Company
           </h3>
           <ul className="space-y-2 text-sm text-gray-300">
-            <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+            <li><NavLink to="/about" className="hover:text-white transition-colors">About Us </NavLink></li>
             <li><a href="#" className="hover:text-white transition-colors">Sustainability</a></li>
             <li><a href="#" className="hover:text-white transition-colors">Store Locator</a></li>
           </ul>

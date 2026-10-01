@@ -1,26 +1,69 @@
 import React, { useState } from 'react';
 
-// Sample data structure for the colors in the grid
-const initialColors = [
-  { id: 1, name: 'Midnight Basin', code: '#1A365D', color: 'bg-[#1A365D]', finish: 'MATTE' },
-  { id: 2, name: 'Yavapai Sky', code: '#455F88', color: 'bg-[#455F88]', finish: 'SATIN' },
-  { id: 3, name: 'Cloud Horizon', code: '#ADC7F7', color: 'bg-[#ADC7F7]', finish: 'EGGSHELL' },
-  { id: 4, name: 'Obsidian Deep', code: '#1A2B3C', color: 'bg-[#1A2B3C]', finish: 'GLOSS' },
-  { id: 5, name: 'Storm Peak', code: '#2D476F', color: 'bg-[#2D476F]', finish: 'MATTE' },
-  { id: 6, name: 'Arctic Mist', code: '#86A0CD', color: 'bg-[#86A0CD]', finish: 'EGGSHELL' },
-  { id: 7, name: 'Abyss', code: '#001B3C', color: 'bg-[#001B3C]', finish: 'GLOSS' },
-  { id: 8, name: 'Glacier Frost', code: '#D6E3FF', color: 'bg-[#D6E3FF]', finish: 'MATTE' },
+// Product dataset organized by categories extracted from the Yava Paints dealer rate list
+const categoriesData = [
+  {
+    id: 'distempers',
+    name: 'Distempers',
+    description: 'High quality interior distempers and wall finishes',
+    products: [
+      { id: 1, name: 'Happy Lac Distemper', size: '20 KGS', price: '₹809.20', imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop' },
+      { id: 2, name: 'Ultra Fine Distemper', size: '20 KGS', price: '₹809.20', imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop' },
+      { id: 3, name: 'Happy Lac (Lemon Suffle)', size: '20 KGS', price: '₹949.20', imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop' },
+      { id: 4, name: 'Happy Lac (Electric Blue)', size: '20 KGS', price: '₹1015.10', imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop' },
+    ]
+  },
+  {
+    id: 'primers',
+    name: 'Primers',
+    description: 'Durable dual, interior, and exterior primers for surface preparation',
+    products: [
+      { id: 7, name: 'Starex Dual Primer', size: '20 LTR', price: '₹1562.40', imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop' },
+      { id: 8, name: 'Maxwell Dual Primer', size: '20 LTR', price: '₹1562.40', imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop' },
+      { id: 9, name: 'Maxwell Exterior Primer', size: '20 LTR', price: '₹1957.70', imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop' },
+      { id: 10, name: 'Maxwell Interior Primer', size: '20 LTR', price: '₹1294.60', imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop' },
+    ]
+  },
+  {
+    id: 'emulsions',
+    name: 'Emulsions',
+    description: 'Premium interior, exterior, and advance dual-power wall paints',
+    products: [
+      { id: 13, name: 'Fordax Exterior Emulsion', size: '20 LTR', price: '₹3145.60', imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop' },
+      { id: 14, name: 'Fordax Interior Emulsion', size: '20 LTR', price: '₹2697.00', imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop' },
+      { id: 15, name: 'Dual Power Emulsion', size: '20 LTR', price: '₹2230.20', imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop' },
+      { id: 16, name: 'Ever Glow Emulsion', size: '20 LTR', price: '₹6836.80', imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop' },
+    ]
+  },
+  {
+    id: 'textures',
+    name: 'Textures',
+    description: 'Decorative and protective heavy-duty surface textures',
+    products: [
+      { id: 19, name: 'Rudra Texture', size: '25 KGS', price: '₹717.20', imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop' },
+      { id: 20, name: 'Ultra Texture (BKT)', size: '20 KGS', price: '₹756.90', imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop' },
+    ]
+  },
+  {
+    id: 'sealants-removers',
+    name: 'Sealants & Removers',
+    description: 'Roof waterproofing solutions and specialized paint removers',
+    products: [
+      { id: 21, name: 'Roof Top Sealant', size: '20 LTR', price: '₹4717.80', imageUrl: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=800&auto=format&fit=crop' },
+      { id: 22, name: 'Paint Remover', size: '1 LTR', price: '₹196.30', imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop' },
+    ]
+  },
+  {
+    id: 'brushes',
+    name: 'Brushes',
+    description: 'Professional paint brushes for clean application',
+    products: [
+      { id: 23, name: 'Yava 5" Brush', size: '1 Crt (12 Pcs)', price: '₹91.10', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop' },
+      { id: 24, name: 'Yava 3" Brush', size: '1 Crt (36 Pcs)', price: '₹35.00', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop' },
+      { id: 25, name: 'Yava 2" Brush', size: '1 Crt (70 Pcs)', price: '₹21.00', imageUrl: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop' },
+    ]
+  }
 ];
-
-const colorFamilies = [
-  { name: 'Neutrals', color: 'bg-[#F3F4F6]' },
-  { name: 'Blues', color: 'bg-[#002B49]', active: true },
-  { name: 'Greens', color: 'bg-[#406637]' },
-  { name: 'Reds', color: 'bg-[#A7372D]' },
-  { name: 'Yellows', color: 'bg-[#EBC349]' },
-];
-
-const finishes = ['Matte', 'Eggshell', 'Satin', 'Gloss'];
 
 const spaceGridImages = [
   { id: 1, size: 'large', type: 'LIVING ROOM', name: 'Industrial Depth', imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop' },
@@ -30,140 +73,143 @@ const spaceGridImages = [
 ];
 
 export default function Collections() {
-  const [selectedFinishes, setSelectedFinishes] = useState(['Matte', 'Eggshell', 'Satin']);
+  const [activeCategory, setActiveCategory] = useState('all');
 
-  const toggleFinish = (finish) => {
-    if (selectedFinishes.includes(finish)) {
-      setSelectedFinishes(selectedFinishes.filter(f => f !== finish));
-    } else {
-      setSelectedFinishes([...selectedFinishes, finish]);
-    }
+  const handleNavigateToCategory = (categoryId) => {
+    // Standard navigation or router push action
+    window.location.href = `/products?category=${categoryId}`;
   };
+
+  const filteredCategories = activeCategory === 'all' 
+    ? categoriesData 
+    : categoriesData.filter(cat => cat.id === activeCategory);
 
   return (
     <div className="w-full min-h-screen bg-[#f4f6fb] text-gray-800 font-sans">
       
-      {/* SECTION 1: COLOR GALLERY */}
+      {/* SECTION 1: PRODUCT CATALOGUE GALLERY */}
       <section className="max-w-7xl mx-auto px-6 py-8 md:py-8">
         {/* Header */}
         <div className="mb-12 space-y-3">
-          <h1 className="font-serif text-4xl font-bold text-[#002B49]">Color Gallery</h1>
+          <h1 className="font-serif text-4xl font-bold text-[#002B49]">Yava Paints Catalogue</h1>
           <p className="text-gray-600 max-w-2xl leading-relaxed">
-            Explore our curated collection of over 500 hand-crafted pigments. From industrial endurance to artisanal delicate finishes.
+            Explore our product catalog ranging from emulsions and distempers to high-grade primers and application tools.
           </p>
         </div>
 
         {/* Gallery Layout */}
         <div className="flex flex-col md:flex-row gap-10">
           
-          {/* 1. Sidebar Filters */}
-          <aside className="w-full md:w-64 space-y-10 shrink-0">
-            {/* Color Family */}
+          {/* 1. Sidebar Category Filter */}
+          <aside className="w-full md:w-64 space-y-8 shrink-0">
             <div className="space-y-4">
-              <h3 className="text-sm font-bold tracking-widest text-[#002B49] uppercase">Color Family</h3>
-              <div className="space-y-2.5">
-                {colorFamilies.map(family => (
-                  <button key={family.name} className={`flex items-center w-full p-2.5 rounded-lg border ${family.active ? 'bg-[#002B49] text-white' : 'bg-white hover:bg-gray-100 border-gray-100'}`}>
-                    <div className={`w-5 h-5 rounded-full ${family.color} ${!family.active ? 'border border-gray-200' : ''}`} />
-                    <span className="ml-3 text-sm font-medium">{family.name}</span>
+              <h3 className="text-sm font-bold tracking-widest text-[#002B49] uppercase">Product Categories</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`flex items-center justify-between w-full p-3 rounded-lg text-sm font-medium transition-colors ${
+                    activeCategory === 'all'
+                      ? 'bg-[#002B49] text-white shadow-sm'
+                      : 'bg-white hover:bg-gray-100 border border-gray-100 text-gray-700'
+                  }`}
+                >
+                  <span>All Products</span>
+                </button>
+
+                {categoriesData.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveCategory(category.id)}
+                    className={`flex items-center justify-between w-full p-3 rounded-lg text-sm font-medium transition-colors ${
+                      activeCategory === category.id
+                        ? 'bg-[#002B49] text-white shadow-sm'
+                        : 'bg-white hover:bg-gray-100 border border-gray-100 text-gray-700'
+                    }`}
+                  >
+                    <span>{category.name}</span>
+                    <span className="text-xs bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 ml-2">
+                      {category.products.length}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
-
-            {/* Finish */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold tracking-widest text-[#002B49] uppercase">Finish</h3>
-              <div className="space-y-2.5">
-                {finishes.map(finish => (
-                  <label key={finish} className="flex items-center space-x-3 cursor-pointer">
-                    <input type="checkbox" checked={selectedFinishes.includes(finish)} onChange={() => toggleFinish(finish)} className="w-5 h-5 accent-[#002B49]" />
-                    <span className="text-sm font-medium text-gray-700">{finish}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Usage */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold tracking-widest text-[#002B49] uppercase">Usage</h3>
-              <div className="space-y-2.5">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input type="radio" name="usage" checked className="w-5 h-5 accent-[#002B49]" />
-                  <span className="text-sm font-medium text-gray-700">Interior</span>
-                </label>
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input type="radio" name="usage" className="w-5 h-5 accent-[#002B49]" />
-                  <span className="text-sm font-medium text-gray-700">Exterior</span>
-                </label>
-              </div>
-            </div>
           </aside>
 
-          {/* 2. Color Grid */}
-          <main className="flex-1 space-y-6">
-            {/* Grid Header */}
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">Showing 48 results for <span className="font-semibold text-gray-900">&quot;Blues&quot;</span></p>
-              <div className="flex items-center text-sm font-medium">
-                <span className="text-gray-500 mr-2">SORT BY:</span>
-                <span className="text-gray-900 font-semibold">Popularity</span>
-                <svg className="w-4 h-4 ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-              </div>
-            </div>
-
-            {/* The Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {initialColors.map(color => (
-                <div key={color.id} className="bg-white rounded-lg p-1 group cursor-pointer shadow-sm hover:shadow-lg transition-shadow">
-                  <div className={`w-full h-44 rounded ${color.color}`} />
-                  <div className="p-3 space-y-1 relative">
-                    <h4 className="text-base font-bold text-[#002B49] group-hover:underline">{color.name}</h4>
-                    <p className="text-xs text-gray-500">{color.code}</p>
-                    <span className="absolute bottom-3 right-3 text-[10px] font-bold text-[#002B49] bg-gray-100 px-2 py-0.5 rounded tracking-wider uppercase">{color.finish}</span>
+          {/* 2. Products Display by Category */}
+          <main className="flex-1 space-y-12">
+            {filteredCategories.map(category => (
+              <div key={category.id} className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                
+                {/* Category Header with View More Link */}
+                <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-[#002B49] font-serif">{category.name}</h2>
+                    <p className="text-sm text-gray-500">{category.description}</p>
                   </div>
+                  <button
+                    onClick={() => handleNavigateToCategory(category.id)}
+                    className="text-sm font-semibold text-[#002B49] hover:underline flex items-center gap-1 shrink-0"
+                  >
+                    View More ({category.products.length})
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
-              ))}
-            </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center pt-8">
-              <nav className="flex items-center space-x-1.5 text-sm font-medium">
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 bg-white text-gray-500 hover:bg-gray-50">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded bg-[#002B49] text-white">1</button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 bg-white hover:bg-gray-50">2</button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 bg-white hover:bg-gray-50">3</button>
-                <span className="px-1 text-gray-400">...</span>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 bg-white hover:bg-gray-50">12</button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 bg-white text-gray-500 hover:bg-gray-50">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                </button>
-              </nav>
-            </div>
+                {/* Grid showing maximum of 4 products */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {category.products.slice(0, 4).map(product => (
+                    <div
+                      key={product.id}
+                      className="group cursor-pointer flex flex-col justify-between border border-gray-100 rounded-xl p-3 hover:shadow-md transition-shadow"
+                    >
+                      <div className="space-y-3">
+                        <div className="relative w-full h-44 rounded-lg overflow-hidden bg-gray-50">
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-[#002B49] group-hover:underline line-clamp-1">
+                            {product.name}
+                          </h4>
+                          <p className="text-xs text-gray-500 font-medium">Pack: {product.size}</p>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-gray-100 mt-3 flex items-center justify-between">
+                        <span className="text-sm font-bold text-[#002B49]">{product.price}</span>
+                        <span className="text-[10px] uppercase tracking-wider font-semibold bg-[#002B49]/10 text-[#002B49] px-2 py-0.5 rounded">
+                          In Stock
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </main>
         </div>
       </section>
 
-      {/* SECTION 2: SEE IT IN YOUR SPACE (With Zoom on Hover) */}
+      {/* SECTION 2: SEE IT IN YOUR SPACE */}
       <section className="bg-white border-t border-gray-100 py-20 px-6 md:px-12">
         <div className="max-w-7xl mx-auto space-y-12">
-          
-          {/* Header */}
           <h2 className="font-serif text-5xl font-bold text-[#002B49] text-center">
             See it in Your Space
           </h2>
 
-          {/* Optimized Grid Layout using absolute positions and hover zoom */}
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4 h-[600px]">
-            
-            {/* 1. Large Feature Card (Industrial Depth) */}
+            {/* 1. Large Feature Card */}
             <div className="relative rounded-2xl overflow-hidden group cursor-pointer shadow-xl">
               <img 
                 src={spaceGridImages[0].imageUrl} 
-                alt="Living Room"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                alt="Living Room" 
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-6 left-6 text-white space-y-1">
@@ -174,13 +220,11 @@ export default function Collections() {
 
             {/* 2. Sub-grid area */}
             <div className="grid grid-rows-2 gap-4">
-              
-              {/* Top half: Small Card with Text button */}
               <div className="relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg">
                 <img 
                   src={spaceGridImages[1].imageUrl} 
-                  alt="Workspace"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                  alt="Workspace" 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110" 
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="bg-white px-6 py-3 rounded-full text-[#002B49] font-semibold text-xs tracking-wider shadow-md hover:scale-105 transition-transform">
@@ -189,20 +233,19 @@ export default function Collections() {
                 </div>
               </div>
 
-              {/* Bottom half: Two smaller image tiles */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative rounded-2xl overflow-hidden group cursor-pointer shadow-md">
                   <img 
                     src={spaceGridImages[2].imageUrl} 
-                    alt="Paint Finish Close up"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                    alt="Paint Finish Close up" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110" 
                   />
                 </div>
                 <div className="relative rounded-2xl overflow-hidden group cursor-pointer shadow-md">
                   <img 
                     src={spaceGridImages[3].imageUrl} 
-                    alt="Exterior House"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                    alt="Exterior House" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110" 
                   />
                 </div>
               </div>
