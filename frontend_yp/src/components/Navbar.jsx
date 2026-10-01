@@ -100,7 +100,7 @@ export default function Navbar() {
         <NavLink to="/" className={navLinkClass}>
           {({ isActive }) => (
             <>
-              Inspiration
+              Inspiratio
               <span
                 className={`absolute left-0 bottom-0 h-[2px] bg-[#002B49] transition-all duration-300 ${
                   isActive ? "w-full" : "w-0"
